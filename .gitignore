@@ -1,0 +1,17 @@
+# Environment variables
+.env
+.env.local
+
+# Supabase
+supabase/.temp/
+supabase/.branches/
+
+# Node
+node_modules/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/

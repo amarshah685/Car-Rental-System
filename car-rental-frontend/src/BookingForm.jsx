@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from './supabaseClient'
+import { calculateDays, calculateTotalPrice, isValidDateRange } from './utils/booking'
 
 function BookingForm({ car, session, onClose, onBooked }) {
   const [startDate, setStartDate] = useState('')
@@ -7,11 +8,8 @@ function BookingForm({ car, session, onClose, onBooked }) {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  const days =
-    startDate && endDate
-      ? Math.max(0, (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24))
-      : 0
-  const totalPrice = days * car.daily_rate
+  const days = calculateDays(startDate, endDate)
+const totalPrice = calculateTotalPrice(startDate, endDate, car.daily_rate)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -21,7 +19,7 @@ function BookingForm({ car, session, onClose, onBooked }) {
       setError('Please select both dates.')
       return
     }
-    if (new Date(endDate) <= new Date(startDate)) {
+    if (!isValidDateRange(startDate, endDate)) {
       setError('End date must be after start date.')
       return
     }

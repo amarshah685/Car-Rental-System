@@ -6,6 +6,7 @@ import BookingForm from './BookingForm'
 import MyBookings from './MyBookings'
 import PaymentForm from './PaymentForm'
 import AdminDashboard from './AdminDashboard'
+import { useToast } from './Toast'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -22,6 +23,7 @@ function App() {
   const [view, setView] = useState('browse')
   const [pendingPayment, setPendingPayment] = useState(null)
   const [profile, setProfile] = useState(null)
+  const showToast = useToast()
 
   useEffect(() => {
     if (!session) return
@@ -182,7 +184,7 @@ function App() {
           onClose={() => setPendingPayment(null)}
           onPaid={() => {
             setPendingPayment(null)
-            alert('Payment successful! Booking confirmed.')
+            showToast('Payment successful! Booking confirmed.', 'success')
           }}
         />
       )}

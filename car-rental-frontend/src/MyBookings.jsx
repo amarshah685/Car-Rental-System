@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
+import { useToast } from './Toast'
 
 function MyBookings({ session }) {
   const [bookings, setBookings] = useState([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
+  const showToast = useToast()
 
   async function fetchBookings() {
     setLoading(true)
@@ -33,17 +35,18 @@ function MyBookings({ session }) {
   }, [])
 
   async function handleCancel(bookingId) {
-    const { error } = await supabase
-      .from('bookings')
-      .update({ status: 'cancelled' })
-      .eq('id', bookingId)
+  const { error } = await supabase
+    .from('bookings')
+    .update({ status: 'cancelled' })
+    .eq('id', bookingId)
 
-    if (error) {
-      alert('Failed to cancel: ' + error.message)
-    } else {
-      fetchBookings()
-    }
+  if (error) {
+    showToast('Failed to cancel: ' + error.message, 'error')
+  } else {
+    showToast('Booking cancelled', 'success')
+    fetchBookings()
   }
+}
 
   if (loading) return <p className="empty-state">Loading your bookings...</p>
   if (error) return <p className="error-text">Error: {error}</p>

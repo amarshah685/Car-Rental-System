@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
+import { useToast } from './Toast'
 
 function AdminDashboard() {
   const [tab, setTab] = useState('bookings')
@@ -8,6 +9,7 @@ function AdminDashboard() {
   const [customers, setCustomers] = useState([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
+  const showToast = useToast()
 
   async function fetchAll() {
     setLoading(true)
@@ -43,16 +45,22 @@ function AdminDashboard() {
   }, [])
 
   async function updateCarStatus(carId, newStatus) {
-    const { error } = await supabase.from('cars').update({ status: newStatus }).eq('id', carId)
-    if (error) alert('Failed: ' + error.message)
-    else fetchAll()
+  const { error } = await supabase.from('cars').update({ status: newStatus }).eq('id', carId)
+  if (error) showToast('Failed: ' + error.message, 'error')
+  else {
+    showToast('Car status updated', 'success')
+    fetchAll()
   }
+}
 
   async function updateBookingStatus(bookingId, newStatus) {
-    const { error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId)
-    if (error) alert('Failed: ' + error.message)
-    else fetchAll()
+  const { error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId)
+  if (error) showToast('Failed: ' + error.message, 'error')
+  else {
+    showToast('Booking status updated', 'success')
+    fetchAll()
   }
+}
 
   if (loading) return <p className="empty-state">Loading admin data...</p>
   if (error) return <p className="error-text">Error: {error}</p>

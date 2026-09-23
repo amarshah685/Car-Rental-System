@@ -27,6 +27,15 @@ function App() {
   const [profile, setProfile] = useState(null)
   const showToast = useToast()
 
+  function resetFilters() {
+  setCategory('')
+  setBranchId('')
+  setMaxPrice('')
+  setStatus('available')
+  setStartDate('')
+  setEndDate('')
+  }
+
   useEffect(() => {
     if (!session) return
     async function fetchProfile() {
@@ -108,11 +117,11 @@ useEffect(() => {
           <button className={`pill ${view === 'browse' ? 'active' : ''}`} onClick={() => setView('browse')}>
             Browse
           </button>
-          <button className={`pill ${view === 'bookings' ? 'active' : ''}`} onClick={() => setView('bookings')}>
+          <button className={`pill ${view === 'bookings' ? 'active' : ''}`} onClick={() => { resetFilters(); setView('bookings') }}>
             My Bookings
           </button>
           {isAdmin && (
-            <button className={`pill ${view === 'admin' ? 'active' : ''}`} onClick={() => setView('admin')}>
+            <button className={`pill ${view === 'admin' ? 'active' : ''}`} onClick={() => { resetFilters(); setView('admin') }}>
               Admin
             </button>
           )}

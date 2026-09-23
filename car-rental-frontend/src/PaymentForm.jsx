@@ -15,8 +15,8 @@ function PaymentForm({ booking, onClose, onPaid }) {
       booking_id: booking.id,
       amount: booking.total_price,
       method,
-      status: 'paid',
-      paid_at: new Date().toISOString(),
+      status: 'pending',
+      paid_at: null,
     })
 
     setLoading(false)

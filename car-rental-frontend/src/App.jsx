@@ -13,6 +13,8 @@ function App() {
   const [cars, setCars] = useState([])
   const [branches, setBranches] = useState([])
   const [error, setError] = useState(null)
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
   const [category, setCategory] = useState('')
   const [branchId, setBranchId] = useState('')
@@ -54,26 +56,40 @@ function App() {
     fetchBranches()
   }, [])
 
-  useEffect(() => {
-    async function fetchCars() {
+useEffect(() => {
+  async function fetchCars() {
+    if (startDate && endDate) {
+      // Date-aware availability search
+      const { data, error } = await supabase.rpc('get_available_cars', {
+        p_start_date: startDate,
+        p_end_date: endDate,
+        p_branch_id: branchId || null,
+        p_category: category || null,
+        p_max_price: maxPrice ? Number(maxPrice) : null,
+      })
+      if (error) setError(error.message)
+      else {
+        setError(null)
+        setCars(data)
+      }
+    } else {
+      // Fallback: static status-based browse (no dates selected yet)
       let query = supabase.from('cars').select('*')
-
       if (category) query = query.eq('category', category)
       if (branchId) query = query.eq('branch_id', branchId)
       if (status) query = query.eq('status', status)
       if (maxPrice) query = query.lte('daily_rate', maxPrice)
 
       const { data, error } = await query.order('daily_rate', { ascending: true })
-
-      if (error) {
-        setError(error.message)
-      } else {
+      if (error) setError(error.message)
+      else {
         setError(null)
         setCars(data)
       }
     }
-    fetchCars()
-  }, [category, branchId, status, maxPrice])
+  }
+  fetchCars()
+}, [category, branchId, status, maxPrice, startDate, endDate])
 
   if (!session) {
     return <Auth onAuth={() => {}} />
@@ -132,6 +148,19 @@ function App() {
               <option value="rented">Rented</option>
               <option value="maintenance">Maintenance</option>
             </select>
+
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              placeholder="Start date"
+            />
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              placeholder="End date"
+            />
 
             <input
               type="number"
